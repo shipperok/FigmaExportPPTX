@@ -1,9 +1,11 @@
 export type Rgb = { r: number; g: number; b: number; a?: number };
+import type { Locale } from "./i18n";
 
 export type ExportOptions = {
   rasterScale: 1 | 2 | 3;
   includeHidden: boolean;
   addSpeakerNotes: boolean;
+  locale: Locale;
 };
 
 export type SelectionSummary = {
@@ -76,6 +78,7 @@ export type ExportSlide = {
 };
 
 export type PluginToUiMessage =
+  | { type: "language"; locale: Locale }
   | { type: "selection"; frames: SelectionSummary }
   | { type: "export-start"; total: number }
   | { type: "export-progress"; current: number; total: number; name: string }
@@ -84,6 +87,7 @@ export type PluginToUiMessage =
 
 export type UiToPluginMessage =
   | { type: "ready" }
+  | { type: "set-language"; locale: Locale }
   | { type: "refresh-selection" }
   | { type: "export"; options: ExportOptions }
   | { type: "resize"; height: number };

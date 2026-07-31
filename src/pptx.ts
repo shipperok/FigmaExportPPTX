@@ -1,4 +1,5 @@
 import PptxGenJS from "pptxgenjs";
+import { t } from "./i18n";
 import type {
   ExportLayer,
   ExportOptions,
@@ -19,7 +20,7 @@ export async function createPresentation(
   fileName: string,
   options: ExportOptions
 ): Promise<ExportResult> {
-  if (!slides.length) throw new Error("Нет слайдов для экспорта.");
+  if (!slides.length) throw new Error(t(options.locale, "errorNoSlides"));
   const pptx = new PptxGenJS();
   const first = slides[0];
   const slideHeight = SLIDE_WIDTH_IN * (first.height / first.width);
@@ -47,7 +48,7 @@ export async function createPresentation(
     const offsetY = (slideHeight - source.height * scale) / 2;
 
     if (Math.abs(source.width / source.height - first.width / first.height) > 0.001) {
-      warnings.add("Фреймы разного формата вписаны в размер первого слайда.");
+      warnings.add(t(options.locale, "warningDifferentSizes"));
     }
     source.warnings.forEach((warning) => warnings.add(warning));
 
@@ -55,7 +56,7 @@ export async function createPresentation(
       addLayer(pptx, slide, layer, scale, offsetX, offsetY);
     }
     if (options.addSpeakerNotes && source.warnings.length) {
-      slide.addNotes(`Особенности экспорта:\n${source.warnings.map((item) => `• ${item}`).join("\n")}`);
+      slide.addNotes(`${t(options.locale, "notesHeading")}\n${source.warnings.map((item) => `• ${item}`).join("\n")}`);
     }
   }
 

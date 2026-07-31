@@ -19,6 +19,7 @@
         padding: 20px 20px 16px;
         border-bottom: 1px solid var(--figma-color-border);
       }
+      .header-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
       .eyebrow {
         display: inline-flex;
         align-items: center;
@@ -32,6 +33,29 @@
         width: 7px;
         height: 7px;
         border-radius: 50%;
+        background: var(--figma-color-bg-brand);
+      }
+      .language-switch {
+        display: inline-flex;
+        padding: 2px;
+        border: 1px solid var(--figma-color-border);
+        border-radius: 7px;
+        background: var(--figma-color-bg-secondary);
+      }
+      .language-switch button {
+        width: 31px;
+        height: 22px;
+        padding: 0;
+        border: 0;
+        border-radius: 5px;
+        color: var(--figma-color-text-secondary);
+        background: transparent;
+        cursor: pointer;
+        font-size: 10px;
+        font-weight: 600;
+      }
+      .language-switch button.is-active {
+        color: var(--figma-color-text-onbrand);
         background: var(--figma-color-bg-brand);
       }
       h1 { font-size: 18px; line-height: 1.25; margin: 0 0 6px; letter-spacing: -0.02em; }
@@ -91,6 +115,7 @@
       .field + .field { border-top: 1px solid var(--figma-color-border); }
       .field-copy { display: flex; flex-direction: column; gap: 2px; }
       .field-copy span { color: var(--figma-color-text-secondary); font-size: 11px; }
+      .field-copy > .field-title { color: var(--figma-color-text); font-size: 12px; }
       select {
         min-width: 74px;
         height: 28px;
@@ -159,28 +184,34 @@
   <body>
     <div class="shell">
       <header>
-        <div class="eyebrow">Editable export</div>
-        <h1>Фреймы → PowerPoint</h1>
-        <p>Текст и простые фигуры останутся редактируемыми. Сложная графика сохранится отдельными объектами.</p>
+        <div class="header-top">
+          <div class="eyebrow" data-i18n="eyebrow">Редактируемый экспорт</div>
+          <div class="language-switch" role="group" aria-label="Language">
+            <button class="is-active" data-language="ru" type="button" aria-pressed="true">RU</button>
+            <button data-language="en" type="button" aria-pressed="false">EN</button>
+          </div>
+        </div>
+        <h1 data-i18n="title">Фреймы → PowerPoint</h1>
+        <p data-i18n="subtitle">Текст и простые фигуры останутся редактируемыми. Сложная графика сохранится отдельными объектами.</p>
       </header>
       <main>
         <div class="section-head">
-          <strong>Выбранные слайды</strong>
+          <strong data-i18n="selectedSlides">Выбранные слайды</strong>
           <span class="section-actions">
-            <span class="order-hint">Автопорядок</span>
-            <button class="link-button" data-refresh type="button">Обновить</button>
+            <span class="order-hint" data-i18n="autoOrder">Автопорядок</span>
+            <button class="link-button" data-refresh data-i18n="refresh" type="button">Обновить</button>
           </span>
         </div>
         <div id="empty-state" class="empty">
-          <strong>Выберите фреймы на холсте</strong>
-          Номера в названиях задают порядок. Без номеров — сверху вниз и слева направо.
+          <strong data-i18n="emptyTitle">Выберите фреймы на холсте</strong>
+          <span data-i18n="emptyText">Номера в названиях задают порядок. Без номеров — сверху вниз и слева направо.</span>
         </div>
         <div id="frame-list" class="frame-list" hidden></div>
 
         <section class="options">
-          <div class="section-head"><strong>Настройки</strong></div>
+          <div class="section-head"><strong data-i18n="settings">Настройки</strong></div>
           <label class="field">
-            <span class="field-copy">Качество PNG <span>Для теней, масок и эффектов</span></span>
+            <span class="field-copy"><span class="field-title" data-i18n="pngQuality">Качество PNG</span><span data-i18n="pngHint">Для теней, масок и эффектов</span></span>
             <select id="raster-scale">
               <option value="1">1×</option>
               <option value="2" selected>2×</option>
@@ -188,21 +219,21 @@
             </select>
           </label>
           <label class="field">
-            <span class="field-copy">Скрытые слои <span>Добавить в презентацию</span></span>
+            <span class="field-copy"><span class="field-title" data-i18n="hiddenLayers">Скрытые слои</span><span data-i18n="hiddenHint">Добавить в презентацию</span></span>
             <input id="include-hidden" type="checkbox" />
           </label>
           <label class="field">
-            <span class="field-copy">Примечания <span>Записать ограничения экспорта</span></span>
+            <span class="field-copy"><span class="field-title" data-i18n="notes">Примечания</span><span data-i18n="notesHint">Записать ограничения экспорта</span></span>
             <input id="add-notes" type="checkbox" checked />
           </label>
         </section>
       </main>
       <footer>
         <div id="warning-box" class="warning" hidden></div>
-        <div id="status" class="status">Готов к экспорту.</div>
+        <div id="status" class="status" data-i18n="ready">Готов к экспорту.</div>
         <div class="progress"><div id="progress-bar"></div></div>
         <button id="export-button" class="primary" type="button" disabled>
-          <span id="button-label">Выберите фреймы</span>
+          <span id="button-label" data-i18n="selectFrames">Выберите фреймы</span>
         </button>
       </footer>
     </div>

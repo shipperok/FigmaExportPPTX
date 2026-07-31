@@ -69,6 +69,16 @@ test("orders unnumbered frames by canvas rows", async () => {
   ]);
 });
 
+test("translates the plugin interface and interpolates progress", async () => {
+  const { t } = await importI18nModule();
+  assert.equal(t("ru", "ready"), "Готов к экспорту.");
+  assert.equal(t("en", "ready"), "Ready to export.");
+  assert.equal(
+    t("en", "progress", { current: 2, total: 5, name: "Title" }),
+    "2 of 5: Title"
+  );
+});
+
 test("writes Figma text at the correct PowerPoint point size", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "figma-pptx-test-"));
   const bundlePath = path.join(directory, "pptx.mjs");
@@ -137,7 +147,7 @@ test("writes Figma text at the correct PowerPoint point size", async () => {
       }]
     }],
     presentationPath,
-    { rasterScale: 2, includeHidden: false, addSpeakerNotes: false }
+    { rasterScale: 2, includeHidden: false, addSpeakerNotes: false, locale: "en" }
   );
 
   await execFileAsync("unzip", ["-q", presentationPath, "ppt/slides/slide1.xml", "-d", directory]);
@@ -154,6 +164,19 @@ async function importOrderModule() {
   const bundlePath = path.join(directory, "order.mjs");
   await build({
     entryPoints: ["src/order.ts"],
+    outfile: bundlePath,
+    bundle: true,
+    platform: "node",
+    format: "esm"
+  });
+  return import(`file://${bundlePath}`);
+}
+
+async function importI18nModule() {
+  const directory = await mkdtemp(path.join(tmpdir(), "figma-i18n-test-"));
+  const bundlePath = path.join(directory, "i18n.mjs");
+  await build({
+    entryPoints: ["src/i18n.ts"],
     outfile: bundlePath,
     bundle: true,
     platform: "node",

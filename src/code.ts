@@ -13,11 +13,16 @@ import type {
   TextRun,
   UiToPluginMessage
 } from "./model";
+import { isLocale, t, type Locale } from "./i18n";
 import { sortBySlideOrder } from "./order";
 
 figma.showUI(__html__, { width: 400, height: 590, themeColors: true });
 
 const post = (message: PluginToUiMessage) => figma.ui.postMessage(message);
+let locale: Locale = "ru";
+const localeReady = figma.clientStorage.getAsync("interfaceLocale").then((stored) => {
+  if (isLocale(stored)) locale = stored;
+});
 
 function selectedFrames(): SceneNode[] {
   const selected = figma.currentPage.selection.filter(
@@ -56,7 +61,18 @@ function sendSelection(): void {
 figma.on("selectionchange", sendSelection);
 
 figma.ui.onmessage = async (message: UiToPluginMessage) => {
-  if (message.type === "ready" || message.type === "refresh-selection") {
+  if (message.type === "ready") {
+    await localeReady;
+    post({ type: "language", locale });
+    sendSelection();
+    return;
+  }
+  if (message.type === "set-language") {
+    locale = message.locale;
+    await figma.clientStorage.setAsync("interfaceLocale", locale);
+    return;
+  }
+  if (message.type === "refresh-selection") {
     sendSelection();
     return;
   }
@@ -69,7 +85,7 @@ figma.ui.onmessage = async (message: UiToPluginMessage) => {
       await exportSelection(message.options);
     } catch (error) {
       const detail = error instanceof Error ? error.message : String(error);
-      post({ type: "error", message: `Не удалось подготовить презентацию: ${detail}` });
+      post({ type: "error", message: t(locale, "errorPrepare", { detail }) });
     }
   }
 };
@@ -77,7 +93,7 @@ figma.ui.onmessage = async (message: UiToPluginMessage) => {
 async function exportSelection(options: ExportOptions): Promise<void> {
   const frames = selectedFrames();
   if (!frames.length) {
-    post({ type: "error", message: "Выберите хотя бы один фрейм, компонент или секцию." });
+    post({ type: "error", message: t(options.locale, "errorNoSelection") });
     return;
   }
 
@@ -106,7 +122,7 @@ async function exportSelection(options: ExportOptions): Promise<void> {
 
 async function serializeSlide(root: SceneNode, options: ExportOptions): Promise<ExportSlide> {
   if (!("absoluteBoundingBox" in root) || !root.absoluteBoundingBox) {
-    throw new Error(`У фрейма «${root.name}» нет размеров.`);
+    throw new Error(t(options.locale, "errorNoBounds", { name: root.name }));
   }
   const box = root.absoluteBoundingBox;
   const layers: ExportLayer[] = [];
@@ -151,7 +167,7 @@ async function serializeNode(
       output.push(text);
     } else {
       output.push(await exportMedia(node, originX, originY, options.rasterScale, "image/svg+xml"));
-      warnings.add("Текст с градиентом или изображением сохранён как SVG.");
+      warnings.add(t(options.locale, "warningTextSvg"));
     }
     return;
   }
@@ -164,7 +180,7 @@ async function serializeNode(
   if (isContainer(node)) {
     if (requiresFlattening(node)) {
       output.push(await exportMedia(node, originX, originY, options.rasterScale, "image/png"));
-      warnings.add("Маски и обрезанные группы сохранены как отдельные PNG-объекты.");
+      warnings.add(t(options.locale, "warningMasksPng"));
       return;
     }
 
@@ -173,7 +189,7 @@ async function serializeNode(
         output.push(serializeShape(node, originX, originY));
       } else {
         output.push(await exportOwnBackground(node, originX, originY, options.rasterScale));
-        warnings.add("Сложные заливки сохранены как отдельные SVG-объекты.");
+        warnings.add(t(options.locale, "warningFillsSvg"));
       }
     }
 
@@ -198,9 +214,7 @@ async function serializeNode(
     )
   );
   warnings.add(
-    vectorLike
-      ? "Сложные контуры сохранены как отдельные SVG-объекты."
-      : "Неподдерживаемые слои сохранены как отдельные PNG-объекты."
+    t(options.locale, vectorLike ? "warningVectorsSvg" : "warningUnsupportedPng")
   );
 }
 
@@ -314,7 +328,7 @@ async function exportMedia(
   const box =
     ("absoluteRenderBounds" in source ? source.absoluteRenderBounds : null) ??
     source.absoluteBoundingBox;
-  if (!box) throw new Error(`Не удалось определить границы слоя «${source.name}».`);
+  if (!box) throw new Error(t(locale, "errorNoLayerBounds", { name: source.name }));
   const settings: ExportSettings =
     mime === "image/svg+xml"
       ? { format: "SVG", svgOutlineText: false, svgIdAttribute: false }
@@ -333,7 +347,7 @@ async function exportMedia(
 
 function baseLayer(node: SceneNode, originX: number, originY: number) {
   const box = node.absoluteBoundingBox;
-  if (!box) throw new Error(`Не удалось определить границы слоя «${node.name}».`);
+  if (!box) throw new Error(t(locale, "errorNoLayerBounds", { name: node.name }));
   return baseLayerFromBox(node, box, originX, originY);
 }
 

@@ -1,4 +1,5 @@
 import { createPresentation } from "./pptx";
+import { t, type Locale, type TranslationKey } from "./i18n";
 import type {
   ExportOptions,
   PluginToUiMessage,
@@ -19,24 +20,28 @@ const warningBox = requiredElement<HTMLDivElement>("warning-box");
 
 let frames: SelectionSummary = [];
 let exporting = false;
+let locale: Locale = "ru";
+let statusState: { key: TranslationKey; values?: Record<string, string | number> } = { key: "ready" };
 
 window.onmessage = async (event: MessageEvent<{ pluginMessage?: PluginToUiMessage }>) => {
   const message = event.data.pluginMessage;
   if (!message) return;
 
-  if (message.type === "selection") {
+  if (message.type === "language") {
+    setLocale(message.locale);
+  } else if (message.type === "selection") {
     frames = message.frames;
     renderFrames();
   } else if (message.type === "export-start") {
     setExporting(true);
-    status.textContent = "Подготавливаю слои…";
+    setStatus("preparing");
     setProgress(0);
   } else if (message.type === "export-progress") {
-    status.textContent = `${message.current} из ${message.total}: ${message.name}`;
+    setStatus("progress", { current: message.current, total: message.total, name: message.name });
     setProgress((message.current / message.total) * 70);
   } else if (message.type === "export-data") {
     try {
-      status.textContent = "Собираю файл PowerPoint…";
+      setStatus("building");
       setProgress(82);
       const result = await createPresentation(
         message.slides,
@@ -44,7 +49,7 @@ window.onmessage = async (event: MessageEvent<{ pluginMessage?: PluginToUiMessag
         message.options
       );
       setProgress(100);
-      status.textContent = "Готово — файл сохранён в загрузки.";
+      setStatus("done");
       showWarnings(result.warnings);
     } catch (error) {
       showError(error instanceof Error ? error.message : String(error));
@@ -63,13 +68,23 @@ exportButton.addEventListener("click", () => {
   const options: ExportOptions = {
     rasterScale: Number(scaleSelect.value) as 1 | 2 | 3,
     includeHidden: includeHidden.checked,
-    addSpeakerNotes: addNotes.checked
+    addSpeakerNotes: addNotes.checked,
+    locale
   };
   send({ type: "export", options });
 });
 
 document.querySelectorAll<HTMLButtonElement>("[data-refresh]").forEach((button) => {
   button.addEventListener("click", () => send({ type: "refresh-selection" }));
+});
+
+document.querySelectorAll<HTMLButtonElement>("[data-language]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const nextLocale = button.dataset.language;
+    if (nextLocale !== "ru" && nextLocale !== "en") return;
+    setLocale(nextLocale);
+    send({ type: "set-language", locale: nextLocale });
+  });
 });
 
 function renderFrames(): void {
@@ -97,9 +112,7 @@ function renderFrames(): void {
     frameList.append(row);
   }
 
-  buttonLabel.textContent = frames.length
-    ? `Экспортировать ${pluralize(frames.length, ["слайд", "слайда", "слайдов"])}`
-    : "Выберите фреймы";
+  updateButtonLabel();
 }
 
 function setExporting(value: boolean): void {
@@ -109,10 +122,7 @@ function setExporting(value: boolean): void {
   scaleSelect.disabled = value;
   includeHidden.disabled = value;
   addNotes.disabled = value;
-  if (!value) buttonLabel.textContent = frames.length
-    ? `Экспортировать ${pluralize(frames.length, ["слайд", "слайда", "слайдов"])}`
-    : "Выберите фреймы";
-  else buttonLabel.textContent = "Экспортирую…";
+  updateButtonLabel();
 }
 
 function setProgress(value: number): void {
@@ -132,6 +142,39 @@ function showError(message: string): void {
   status.textContent = message;
   status.classList.add("is-error");
   setTimeout(() => status.classList.remove("is-error"), 4000);
+}
+
+function setLocale(nextLocale: Locale): void {
+  locale = nextLocale;
+  document.documentElement.lang = locale;
+  document.querySelectorAll<HTMLElement>("[data-i18n]").forEach((element) => {
+    const key = element.dataset.i18n as TranslationKey | undefined;
+    if (key) element.textContent = t(locale, key);
+  });
+  document.querySelectorAll<HTMLButtonElement>("[data-language]").forEach((button) => {
+    const active = button.dataset.language === locale;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+  setStatus(statusState.key, statusState.values);
+  renderFrames();
+}
+
+function setStatus(key: TranslationKey, values?: Record<string, string | number>): void {
+  statusState = { key, values };
+  status.textContent = t(locale, key, values);
+}
+
+function updateButtonLabel(): void {
+  if (exporting) {
+    buttonLabel.textContent = t(locale, "exporting");
+  } else if (!frames.length) {
+    buttonLabel.textContent = t(locale, "selectFrames");
+  } else if (locale === "en") {
+    buttonLabel.textContent = `Export ${frames.length} slide${frames.length === 1 ? "" : "s"}`;
+  } else {
+    buttonLabel.textContent = `Экспортировать ${pluralize(frames.length, ["слайд", "слайда", "слайдов"])}`;
+  }
 }
 
 function send(message: UiToPluginMessage): void {

@@ -1,5 +1,91 @@
 "use strict";
 (() => {
+  // src/i18n.ts
+  var translations = {
+    ru: {
+      eyebrow: "\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u0443\u0435\u043C\u044B\u0439 \u044D\u043A\u0441\u043F\u043E\u0440\u0442",
+      title: "\u0424\u0440\u0435\u0439\u043C\u044B \u2192 PowerPoint",
+      subtitle: "\u0422\u0435\u043A\u0441\u0442 \u0438 \u043F\u0440\u043E\u0441\u0442\u044B\u0435 \u0444\u0438\u0433\u0443\u0440\u044B \u043E\u0441\u0442\u0430\u043D\u0443\u0442\u0441\u044F \u0440\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u0443\u0435\u043C\u044B\u043C\u0438. \u0421\u043B\u043E\u0436\u043D\u0430\u044F \u0433\u0440\u0430\u0444\u0438\u043A\u0430 \u0441\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u0441\u044F \u043E\u0442\u0434\u0435\u043B\u044C\u043D\u044B\u043C\u0438 \u043E\u0431\u044A\u0435\u043A\u0442\u0430\u043C\u0438.",
+      selectedSlides: "\u0412\u044B\u0431\u0440\u0430\u043D\u043D\u044B\u0435 \u0441\u043B\u0430\u0439\u0434\u044B",
+      autoOrder: "\u0410\u0432\u0442\u043E\u043F\u043E\u0440\u044F\u0434\u043E\u043A",
+      refresh: "\u041E\u0431\u043D\u043E\u0432\u0438\u0442\u044C",
+      emptyTitle: "\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0444\u0440\u0435\u0439\u043C\u044B \u043D\u0430 \u0445\u043E\u043B\u0441\u0442\u0435",
+      emptyText: "\u041D\u043E\u043C\u0435\u0440\u0430 \u0432 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u044F\u0445 \u0437\u0430\u0434\u0430\u044E\u0442 \u043F\u043E\u0440\u044F\u0434\u043E\u043A. \u0411\u0435\u0437 \u043D\u043E\u043C\u0435\u0440\u043E\u0432 \u2014 \u0441\u0432\u0435\u0440\u0445\u0443 \u0432\u043D\u0438\u0437 \u0438 \u0441\u043B\u0435\u0432\u0430 \u043D\u0430\u043F\u0440\u0430\u0432\u043E.",
+      settings: "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438",
+      pngQuality: "\u041A\u0430\u0447\u0435\u0441\u0442\u0432\u043E PNG",
+      pngHint: "\u0414\u043B\u044F \u0442\u0435\u043D\u0435\u0439, \u043C\u0430\u0441\u043E\u043A \u0438 \u044D\u0444\u0444\u0435\u043A\u0442\u043E\u0432",
+      hiddenLayers: "\u0421\u043A\u0440\u044B\u0442\u044B\u0435 \u0441\u043B\u043E\u0438",
+      hiddenHint: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0432 \u043F\u0440\u0435\u0437\u0435\u043D\u0442\u0430\u0446\u0438\u044E",
+      notes: "\u041F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u044F",
+      notesHint: "\u0417\u0430\u043F\u0438\u0441\u0430\u0442\u044C \u043E\u0433\u0440\u0430\u043D\u0438\u0447\u0435\u043D\u0438\u044F \u044D\u043A\u0441\u043F\u043E\u0440\u0442\u0430",
+      ready: "\u0413\u043E\u0442\u043E\u0432 \u043A \u044D\u043A\u0441\u043F\u043E\u0440\u0442\u0443.",
+      selectFrames: "\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0444\u0440\u0435\u0439\u043C\u044B",
+      exporting: "\u042D\u043A\u0441\u043F\u043E\u0440\u0442\u0438\u0440\u0443\u044E\u2026",
+      preparing: "\u041F\u043E\u0434\u0433\u043E\u0442\u0430\u0432\u043B\u0438\u0432\u0430\u044E \u0441\u043B\u043E\u0438\u2026",
+      progress: "{{current}} \u0438\u0437 {{total}}: {{name}}",
+      building: "\u0421\u043E\u0431\u0438\u0440\u0430\u044E \u0444\u0430\u0439\u043B PowerPoint\u2026",
+      done: "\u0413\u043E\u0442\u043E\u0432\u043E \u2014 \u0444\u0430\u0439\u043B \u0441\u043E\u0445\u0440\u0430\u043D\u0451\u043D \u0432 \u0437\u0430\u0433\u0440\u0443\u0437\u043A\u0438.",
+      errorPrepare: "\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u043F\u043E\u0434\u0433\u043E\u0442\u043E\u0432\u0438\u0442\u044C \u043F\u0440\u0435\u0437\u0435\u043D\u0442\u0430\u0446\u0438\u044E: {{detail}}",
+      errorNoSelection: "\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0445\u043E\u0442\u044F \u0431\u044B \u043E\u0434\u0438\u043D \u0444\u0440\u0435\u0439\u043C, \u043A\u043E\u043C\u043F\u043E\u043D\u0435\u043D\u0442 \u0438\u043B\u0438 \u0441\u0435\u043A\u0446\u0438\u044E.",
+      errorNoBounds: "\u0423 \u0444\u0440\u0435\u0439\u043C\u0430 \xAB{{name}}\xBB \u043D\u0435\u0442 \u0440\u0430\u0437\u043C\u0435\u0440\u043E\u0432.",
+      errorNoLayerBounds: "\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u043E\u043F\u0440\u0435\u0434\u0435\u043B\u0438\u0442\u044C \u0433\u0440\u0430\u043D\u0438\u0446\u044B \u0441\u043B\u043E\u044F \xAB{{name}}\xBB.",
+      errorNoSlides: "\u041D\u0435\u0442 \u0441\u043B\u0430\u0439\u0434\u043E\u0432 \u0434\u043B\u044F \u044D\u043A\u0441\u043F\u043E\u0440\u0442\u0430.",
+      warningTextSvg: "\u0422\u0435\u043A\u0441\u0442 \u0441 \u0433\u0440\u0430\u0434\u0438\u0435\u043D\u0442\u043E\u043C \u0438\u043B\u0438 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435\u043C \u0441\u043E\u0445\u0440\u0430\u043D\u0451\u043D \u043A\u0430\u043A SVG.",
+      warningMasksPng: "\u041C\u0430\u0441\u043A\u0438 \u0438 \u043E\u0431\u0440\u0435\u0437\u0430\u043D\u043D\u044B\u0435 \u0433\u0440\u0443\u043F\u043F\u044B \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u044B \u043A\u0430\u043A \u043E\u0442\u0434\u0435\u043B\u044C\u043D\u044B\u0435 PNG-\u043E\u0431\u044A\u0435\u043A\u0442\u044B.",
+      warningFillsSvg: "\u0421\u043B\u043E\u0436\u043D\u044B\u0435 \u0437\u0430\u043B\u0438\u0432\u043A\u0438 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u044B \u043A\u0430\u043A \u043E\u0442\u0434\u0435\u043B\u044C\u043D\u044B\u0435 SVG-\u043E\u0431\u044A\u0435\u043A\u0442\u044B.",
+      warningVectorsSvg: "\u0421\u043B\u043E\u0436\u043D\u044B\u0435 \u043A\u043E\u043D\u0442\u0443\u0440\u044B \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u044B \u043A\u0430\u043A \u043E\u0442\u0434\u0435\u043B\u044C\u043D\u044B\u0435 SVG-\u043E\u0431\u044A\u0435\u043A\u0442\u044B.",
+      warningUnsupportedPng: "\u041D\u0435\u043F\u043E\u0434\u0434\u0435\u0440\u0436\u0438\u0432\u0430\u0435\u043C\u044B\u0435 \u0441\u043B\u043E\u0438 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u044B \u043A\u0430\u043A \u043E\u0442\u0434\u0435\u043B\u044C\u043D\u044B\u0435 PNG-\u043E\u0431\u044A\u0435\u043A\u0442\u044B.",
+      warningDifferentSizes: "\u0424\u0440\u0435\u0439\u043C\u044B \u0440\u0430\u0437\u043D\u043E\u0433\u043E \u0444\u043E\u0440\u043C\u0430\u0442\u0430 \u0432\u043F\u0438\u0441\u0430\u043D\u044B \u0432 \u0440\u0430\u0437\u043C\u0435\u0440 \u043F\u0435\u0440\u0432\u043E\u0433\u043E \u0441\u043B\u0430\u0439\u0434\u0430.",
+      notesHeading: "\u041E\u0441\u043E\u0431\u0435\u043D\u043D\u043E\u0441\u0442\u0438 \u044D\u043A\u0441\u043F\u043E\u0440\u0442\u0430:"
+    },
+    en: {
+      eyebrow: "Editable export",
+      title: "Frames \u2192 PowerPoint",
+      subtitle: "Text and simple shapes remain editable. Complex artwork is preserved as separate objects.",
+      selectedSlides: "Selected slides",
+      autoOrder: "Auto order",
+      refresh: "Refresh",
+      emptyTitle: "Select frames on the canvas",
+      emptyText: "Numbered names define the order. Otherwise: top to bottom, then left to right.",
+      settings: "Settings",
+      pngQuality: "PNG quality",
+      pngHint: "For shadows, masks and effects",
+      hiddenLayers: "Hidden layers",
+      hiddenHint: "Include in the presentation",
+      notes: "Speaker notes",
+      notesHint: "Record export limitations",
+      ready: "Ready to export.",
+      selectFrames: "Select frames",
+      exporting: "Exporting\u2026",
+      preparing: "Preparing layers\u2026",
+      progress: "{{current}} of {{total}}: {{name}}",
+      building: "Building the PowerPoint file\u2026",
+      done: "Done \u2014 the file was saved to Downloads.",
+      errorPrepare: "Could not prepare the presentation: {{detail}}",
+      errorNoSelection: "Select at least one frame, component, or section.",
+      errorNoBounds: "Frame \u201C{{name}}\u201D has no dimensions.",
+      errorNoLayerBounds: "Could not determine the bounds of layer \u201C{{name}}\u201D.",
+      errorNoSlides: "There are no slides to export.",
+      warningTextSvg: "Text with a gradient or image fill was saved as SVG.",
+      warningMasksPng: "Masks and clipped groups were saved as separate PNG objects.",
+      warningFillsSvg: "Complex fills were saved as separate SVG objects.",
+      warningVectorsSvg: "Complex paths were saved as separate SVG objects.",
+      warningUnsupportedPng: "Unsupported layers were saved as separate PNG objects.",
+      warningDifferentSizes: "Frames with different aspect ratios were fitted to the first slide size.",
+      notesHeading: "Export notes:"
+    }
+  };
+  function isLocale(value) {
+    return value === "ru" || value === "en";
+  }
+  function t(locale2, key, values = {}) {
+    let text = translations[locale2][key];
+    for (const [name, value] of Object.entries(values)) {
+      text = text.split(`{{${name}}}`).join(String(value));
+    }
+    return text;
+  }
+
   // src/order.ts
   function sortBySlideOrder(items) {
     const numbered = items.map((item) => ({ item, number: numericPrefix(item.name) }));
@@ -41,6 +127,10 @@
   // src/code.ts
   figma.showUI(__html__, { width: 400, height: 590, themeColors: true });
   var post = (message) => figma.ui.postMessage(message);
+  var locale = "ru";
+  var localeReady = figma.clientStorage.getAsync("interfaceLocale").then((stored) => {
+    if (isLocale(stored)) locale = stored;
+  });
   function selectedFrames() {
     const selected = figma.currentPage.selection.filter(
       (node) => node.type === "FRAME" || node.type === "COMPONENT" || node.type === "INSTANCE" || node.type === "SECTION"
@@ -71,7 +161,18 @@
   }
   figma.on("selectionchange", sendSelection);
   figma.ui.onmessage = async (message) => {
-    if (message.type === "ready" || message.type === "refresh-selection") {
+    if (message.type === "ready") {
+      await localeReady;
+      post({ type: "language", locale });
+      sendSelection();
+      return;
+    }
+    if (message.type === "set-language") {
+      locale = message.locale;
+      await figma.clientStorage.setAsync("interfaceLocale", locale);
+      return;
+    }
+    if (message.type === "refresh-selection") {
       sendSelection();
       return;
     }
@@ -84,14 +185,14 @@
         await exportSelection(message.options);
       } catch (error) {
         const detail = error instanceof Error ? error.message : String(error);
-        post({ type: "error", message: `\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u043F\u043E\u0434\u0433\u043E\u0442\u043E\u0432\u0438\u0442\u044C \u043F\u0440\u0435\u0437\u0435\u043D\u0442\u0430\u0446\u0438\u044E: ${detail}` });
+        post({ type: "error", message: t(locale, "errorPrepare", { detail }) });
       }
     }
   };
   async function exportSelection(options) {
     const frames = selectedFrames();
     if (!frames.length) {
-      post({ type: "error", message: "\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0445\u043E\u0442\u044F \u0431\u044B \u043E\u0434\u0438\u043D \u0444\u0440\u0435\u0439\u043C, \u043A\u043E\u043C\u043F\u043E\u043D\u0435\u043D\u0442 \u0438\u043B\u0438 \u0441\u0435\u043A\u0446\u0438\u044E." });
+      post({ type: "error", message: t(options.locale, "errorNoSelection") });
       return;
     }
     post({ type: "export-start", total: frames.length });
@@ -116,7 +217,7 @@
   }
   async function serializeSlide(root, options) {
     if (!("absoluteBoundingBox" in root) || !root.absoluteBoundingBox) {
-      throw new Error(`\u0423 \u0444\u0440\u0435\u0439\u043C\u0430 \xAB${root.name}\xBB \u043D\u0435\u0442 \u0440\u0430\u0437\u043C\u0435\u0440\u043E\u0432.`);
+      throw new Error(t(options.locale, "errorNoBounds", { name: root.name }));
     }
     const box = root.absoluteBoundingBox;
     const layers = [];
@@ -149,7 +250,7 @@
         output.push(text);
       } else {
         output.push(await exportMedia(node, originX, originY, options.rasterScale, "image/svg+xml"));
-        warnings.add("\u0422\u0435\u043A\u0441\u0442 \u0441 \u0433\u0440\u0430\u0434\u0438\u0435\u043D\u0442\u043E\u043C \u0438\u043B\u0438 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435\u043C \u0441\u043E\u0445\u0440\u0430\u043D\u0451\u043D \u043A\u0430\u043A SVG.");
+        warnings.add(t(options.locale, "warningTextSvg"));
       }
       return;
     }
@@ -160,7 +261,7 @@
     if (isContainer(node)) {
       if (requiresFlattening(node)) {
         output.push(await exportMedia(node, originX, originY, options.rasterScale, "image/png"));
-        warnings.add("\u041C\u0430\u0441\u043A\u0438 \u0438 \u043E\u0431\u0440\u0435\u0437\u0430\u043D\u043D\u044B\u0435 \u0433\u0440\u0443\u043F\u043F\u044B \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u044B \u043A\u0430\u043A \u043E\u0442\u0434\u0435\u043B\u044C\u043D\u044B\u0435 PNG-\u043E\u0431\u044A\u0435\u043A\u0442\u044B.");
+        warnings.add(t(options.locale, "warningMasksPng"));
         return;
       }
       if (hasVisiblePaint(node)) {
@@ -168,7 +269,7 @@
           output.push(serializeShape(node, originX, originY));
         } else {
           output.push(await exportOwnBackground(node, originX, originY, options.rasterScale));
-          warnings.add("\u0421\u043B\u043E\u0436\u043D\u044B\u0435 \u0437\u0430\u043B\u0438\u0432\u043A\u0438 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u044B \u043A\u0430\u043A \u043E\u0442\u0434\u0435\u043B\u044C\u043D\u044B\u0435 SVG-\u043E\u0431\u044A\u0435\u043A\u0442\u044B.");
+          warnings.add(t(options.locale, "warningFillsSvg"));
         }
       }
       for (const child of node.children) {
@@ -187,7 +288,7 @@
       )
     );
     warnings.add(
-      vectorLike ? "\u0421\u043B\u043E\u0436\u043D\u044B\u0435 \u043A\u043E\u043D\u0442\u0443\u0440\u044B \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u044B \u043A\u0430\u043A \u043E\u0442\u0434\u0435\u043B\u044C\u043D\u044B\u0435 SVG-\u043E\u0431\u044A\u0435\u043A\u0442\u044B." : "\u041D\u0435\u043F\u043E\u0434\u0434\u0435\u0440\u0436\u0438\u0432\u0430\u0435\u043C\u044B\u0435 \u0441\u043B\u043E\u0438 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u044B \u043A\u0430\u043A \u043E\u0442\u0434\u0435\u043B\u044C\u043D\u044B\u0435 PNG-\u043E\u0431\u044A\u0435\u043A\u0442\u044B."
+      t(options.locale, vectorLike ? "warningVectorsSvg" : "warningUnsupportedPng")
     );
   }
   function serializeText(node, originX, originY) {
@@ -263,7 +364,7 @@
   async function exportMedia(node, originX, originY, rasterScale, mime, geometrySource) {
     const source = geometrySource ?? node;
     const box = ("absoluteRenderBounds" in source ? source.absoluteRenderBounds : null) ?? source.absoluteBoundingBox;
-    if (!box) throw new Error(`\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u043E\u043F\u0440\u0435\u0434\u0435\u043B\u0438\u0442\u044C \u0433\u0440\u0430\u043D\u0438\u0446\u044B \u0441\u043B\u043E\u044F \xAB${source.name}\xBB.`);
+    if (!box) throw new Error(t(locale, "errorNoLayerBounds", { name: source.name }));
     const settings = mime === "image/svg+xml" ? { format: "SVG", svgOutlineText: false, svgIdAttribute: false } : { format: "PNG", constraint: { type: "SCALE", value: rasterScale } };
     const bytes = await node.exportAsync(settings);
     const layer = {
@@ -277,7 +378,7 @@
   }
   function baseLayer(node, originX, originY) {
     const box = node.absoluteBoundingBox;
-    if (!box) throw new Error(`\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u043E\u043F\u0440\u0435\u0434\u0435\u043B\u0438\u0442\u044C \u0433\u0440\u0430\u043D\u0438\u0446\u044B \u0441\u043B\u043E\u044F \xAB${node.name}\xBB.`);
+    if (!box) throw new Error(t(locale, "errorNoLayerBounds", { name: node.name }));
     return baseLayerFromBox(node, box, originX, originY);
   }
   function baseLayerFromBox(node, box, originX, originY) {

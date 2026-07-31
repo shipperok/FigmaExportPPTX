@@ -290,19 +290,27 @@ async function exportMedia(
   geometrySource?: SceneNode
 ): Promise<MediaLayer> {
   const source = geometrySource ?? node;
-  const box = source.absoluteBoundingBox;
+  // exportAsync renders the visual bounds of a node. A frame with clipsContent=false
+  // can have an absoluteBoundingBox much larger than the exported bitmap because of
+  // overflowing descendants. Using that box stretches the bitmap in PowerPoint.
+  const box =
+    ("absoluteRenderBounds" in source ? source.absoluteRenderBounds : null) ??
+    source.absoluteBoundingBox;
   if (!box) throw new Error(`Не удалось определить границы слоя «${source.name}».`);
   const settings: ExportSettings =
     mime === "image/svg+xml"
       ? { format: "SVG", svgOutlineText: false, svgIdAttribute: false }
       : { format: "PNG", constraint: { type: "SCALE", value: rasterScale } };
   const bytes = await node.exportAsync(settings);
-  return {
+  const layer: MediaLayer = {
     ...baseLayerFromBox(source, box, originX, originY),
     kind: "media",
     mime,
     base64: bytesToBase64(bytes)
   };
+  // Rotation is already baked into bytes returned by exportAsync.
+  layer.rotation = 0;
+  return layer;
 }
 
 function baseLayer(node: SceneNode, originX: number, originY: number) {

@@ -1,6 +1,6 @@
 {
   "name": "figma-editable-pptx-export",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Figma plugin that exports selected frames to an editable PowerPoint presentation.",
   "scripts": {

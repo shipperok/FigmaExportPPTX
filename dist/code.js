@@ -207,16 +207,18 @@
   }
   async function exportMedia(node, originX, originY, rasterScale, mime, geometrySource) {
     const source = geometrySource ?? node;
-    const box = source.absoluteBoundingBox;
+    const box = ("absoluteRenderBounds" in source ? source.absoluteRenderBounds : null) ?? source.absoluteBoundingBox;
     if (!box) throw new Error(`\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u043E\u043F\u0440\u0435\u0434\u0435\u043B\u0438\u0442\u044C \u0433\u0440\u0430\u043D\u0438\u0446\u044B \u0441\u043B\u043E\u044F \xAB${source.name}\xBB.`);
     const settings = mime === "image/svg+xml" ? { format: "SVG", svgOutlineText: false, svgIdAttribute: false } : { format: "PNG", constraint: { type: "SCALE", value: rasterScale } };
     const bytes = await node.exportAsync(settings);
-    return {
+    const layer = {
       ...baseLayerFromBox(source, box, originX, originY),
       kind: "media",
       mime,
       base64: bytesToBase64(bytes)
     };
+    layer.rotation = 0;
+    return layer;
   }
   function baseLayer(node, originX, originY) {
     const box = node.absoluteBoundingBox;

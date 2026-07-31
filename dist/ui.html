@@ -7934,7 +7934,6 @@ ${String(ex)}`);
   };
 
   // src/pptx.ts
-  var PX_TO_PT = 72 / 96;
   var SLIDE_WIDTH_IN = 13.333;
   async function createPresentation(slides, fileName, options) {
     if (!slides.length) throw new Error("\u041D\u0435\u0442 \u0441\u043B\u0430\u0439\u0434\u043E\u0432 \u0434\u043B\u044F \u044D\u043A\u0441\u043F\u043E\u0440\u0442\u0430.");
@@ -8002,14 +8001,14 @@ ${source.warnings.map((item) => `\u2022 ${item}`).join("\n")}`);
       text: run.text,
       options: {
         fontFace: run.fontFamily || "Arial",
-        fontSize: Math.max(run.fontSize * PX_TO_PT * scale, 1),
+        fontSize: Math.max(pixelsToPoints(run.fontSize, scale), 1),
         color: rgbHex(run.color),
         transparency: opacityToTransparency(run.opacity * (run.color.a ?? 1)),
         bold: /bold|black|heavy/i.test(run.fontStyle),
         italic: /italic|oblique/i.test(run.fontStyle),
         underline: run.textDecoration === "UNDERLINE" ? { style: "sng" } : void 0,
         strike: run.textDecoration === "STRIKETHROUGH" ? "sngStrike" : void 0,
-        charSpacing: run.letterSpacing ? run.letterSpacing * PX_TO_PT * scale : void 0,
+        charSpacing: run.letterSpacing ? pixelsToPoints(run.letterSpacing, scale) : void 0,
         breakLine: false
       }
     }));
@@ -8020,7 +8019,7 @@ ${source.warnings.map((item) => `\u2022 ${item}`).join("\n")}`);
       align: textAlign(layer.align),
       valign: verticalAlign(layer.verticalAlign),
       lineSpacingMultiple: layer.lineHeight && layer.runs[0] ? layer.lineHeight / layer.runs[0].fontSize * 1 : void 0,
-      paraSpaceAfter: layer.paragraphSpacing ? layer.paragraphSpacing * PX_TO_PT * scale : void 0,
+      paraSpaceAfter: layer.paragraphSpacing ? pixelsToPoints(layer.paragraphSpacing, scale) : void 0,
       fit: "shrink",
       isTextBox: true
     });
@@ -8030,7 +8029,7 @@ ${source.warnings.map((item) => `\u2022 ${item}`).join("\n")}`);
     const line = layer.stroke ? {
       color: rgbHex(layer.stroke),
       transparency: opacityToTransparency(layer.stroke.a ?? 1),
-      width: Math.max((layer.strokeWidth ?? 1) * PX_TO_PT * scale, 0.1),
+      width: Math.max(pixelsToPoints(layer.strokeWidth ?? 1, scale), 0.1),
       dash: dashType(layer.dash)
     } : { color: "FFFFFF", transparency: 100, width: 0 };
     if (layer.shape === "line") {
@@ -8049,6 +8048,9 @@ ${source.warnings.map((item) => `\u2022 ${item}`).join("\n")}`);
   }
   function opacityToTransparency(opacity) {
     return Math.round((1 - Math.max(0, Math.min(1, opacity))) * 100);
+  }
+  function pixelsToPoints(pixels, inchesPerPixel) {
+    return pixels * inchesPerPixel * 72;
   }
   function normalizeRotation(value) {
     return (value % 360 + 360) % 360;

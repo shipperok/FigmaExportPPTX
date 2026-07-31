@@ -12,7 +12,6 @@ export type ExportResult = {
   warnings: string[];
 };
 
-const PX_TO_PT = 72 / 96;
 const SLIDE_WIDTH_IN = 13.333;
 
 export async function createPresentation(
@@ -102,14 +101,14 @@ function addText(
     text: run.text,
     options: {
       fontFace: run.fontFamily || "Arial",
-      fontSize: Math.max(run.fontSize * PX_TO_PT * scale, 1),
+      fontSize: Math.max(pixelsToPoints(run.fontSize, scale), 1),
       color: rgbHex(run.color),
       transparency: opacityToTransparency(run.opacity * (run.color.a ?? 1)),
       bold: /bold|black|heavy/i.test(run.fontStyle),
       italic: /italic|oblique/i.test(run.fontStyle),
       underline: run.textDecoration === "UNDERLINE" ? { style: "sng" as const } : undefined,
       strike: run.textDecoration === "STRIKETHROUGH" ? "sngStrike" as const : undefined,
-      charSpacing: run.letterSpacing ? run.letterSpacing * PX_TO_PT * scale : undefined,
+      charSpacing: run.letterSpacing ? pixelsToPoints(run.letterSpacing, scale) : undefined,
       breakLine: false
     }
   }));
@@ -123,7 +122,7 @@ function addText(
       ? (layer.lineHeight / layer.runs[0].fontSize) * 1.0
       : undefined,
     paraSpaceAfter: layer.paragraphSpacing
-      ? layer.paragraphSpacing * PX_TO_PT * scale
+      ? pixelsToPoints(layer.paragraphSpacing, scale)
       : undefined,
     fit: "shrink",
     isTextBox: true
@@ -144,7 +143,7 @@ function addShape(
     ? {
         color: rgbHex(layer.stroke),
         transparency: opacityToTransparency(layer.stroke.a ?? 1),
-        width: Math.max((layer.strokeWidth ?? 1) * PX_TO_PT * scale, 0.1),
+        width: Math.max(pixelsToPoints(layer.strokeWidth ?? 1, scale), 0.1),
         dash: dashType(layer.dash)
       }
     : { color: "FFFFFF", transparency: 100, width: 0 };
@@ -180,6 +179,10 @@ function opacityToTransparency(opacity: number): number {
   return Math.round((1 - Math.max(0, Math.min(1, opacity))) * 100);
 }
 
+function pixelsToPoints(pixels: number, inchesPerPixel: number): number {
+  return pixels * inchesPerPixel * 72;
+}
+
 function normalizeRotation(value: number): number {
   return ((value % 360) + 360) % 360;
 }
@@ -207,5 +210,6 @@ function dashType(
 export const conversionInternals = {
   rgbHex,
   opacityToTransparency,
-  normalizeRotation
+  normalizeRotation,
+  pixelsToPoints
 };

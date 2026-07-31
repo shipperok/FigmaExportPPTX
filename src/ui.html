@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: Inter, system-ui, sans-serif;
+        font-size: 12px;
+        color: var(--figma-color-text);
+        background: var(--figma-color-bg);
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; }
+      button, select, input { font: inherit; }
+      .shell { min-height: 100vh; display: flex; flex-direction: column; }
+      header {
+        padding: 20px 20px 16px;
+        border-bottom: 1px solid var(--figma-color-border);
+      }
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--figma-color-text-brand);
+        font-weight: 600;
+        margin-bottom: 7px;
+      }
+      .eyebrow::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--figma-color-bg-brand);
+      }
+      h1 { font-size: 18px; line-height: 1.25; margin: 0 0 6px; letter-spacing: -0.02em; }
+      header p { color: var(--figma-color-text-secondary); margin: 0; line-height: 1.45; }
+      main { padding: 18px 20px 0; flex: 1; overflow: auto; }
+      .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+      .section-head strong { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+      .link-button {
+        border: 0;
+        background: transparent;
+        color: var(--figma-color-text-brand);
+        cursor: pointer;
+        padding: 2px;
+      }
+      .frame-list {
+        border: 1px solid var(--figma-color-border);
+        border-radius: 10px;
+        overflow: hidden;
+        max-height: 152px;
+        overflow-y: auto;
+      }
+      .frame-row { display: flex; gap: 10px; align-items: center; padding: 10px 11px; }
+      .frame-row + .frame-row { border-top: 1px solid var(--figma-color-border); }
+      .frame-number {
+        display: grid;
+        place-items: center;
+        width: 24px;
+        height: 24px;
+        flex: 0 0 auto;
+        border-radius: 6px;
+        color: var(--figma-color-text-brand);
+        background: var(--figma-color-bg-brand-tertiary);
+        font-weight: 600;
+      }
+      .frame-copy { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+      .frame-copy strong { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+      .frame-copy span { color: var(--figma-color-text-secondary); font-size: 11px; }
+      .empty {
+        padding: 21px 18px;
+        border-radius: 10px;
+        border: 1px dashed var(--figma-color-border-strong);
+        text-align: center;
+        color: var(--figma-color-text-secondary);
+        line-height: 1.45;
+      }
+      .empty strong { display: block; color: var(--figma-color-text); margin-bottom: 3px; }
+      .options { margin-top: 18px; }
+      .field {
+        min-height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      .field + .field { border-top: 1px solid var(--figma-color-border); }
+      .field-copy { display: flex; flex-direction: column; gap: 2px; }
+      .field-copy span { color: var(--figma-color-text-secondary); font-size: 11px; }
+      select {
+        min-width: 74px;
+        height: 28px;
+        color: var(--figma-color-text);
+        background: var(--figma-color-bg-secondary);
+        border: 1px solid var(--figma-color-border);
+        border-radius: 6px;
+        padding: 0 8px;
+      }
+      input[type="checkbox"] {
+        appearance: none;
+        width: 28px;
+        height: 16px;
+        border-radius: 999px;
+        background: var(--figma-color-bg-disabled);
+        position: relative;
+        cursor: pointer;
+        transition: background .15s ease;
+      }
+      input[type="checkbox"]::after {
+        content: "";
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        top: 2px;
+        left: 2px;
+        background: white;
+        box-shadow: 0 1px 2px rgba(0,0,0,.22);
+        transition: transform .15s ease;
+      }
+      input[type="checkbox"]:checked { background: var(--figma-color-bg-brand); }
+      input[type="checkbox"]:checked::after { transform: translateX(12px); }
+      footer {
+        padding: 14px 20px 18px;
+        border-top: 1px solid var(--figma-color-border);
+        background: var(--figma-color-bg);
+      }
+      .warning {
+        margin-bottom: 10px;
+        padding: 9px 10px;
+        border-radius: 7px;
+        background: var(--figma-color-bg-warning-tertiary);
+        color: var(--figma-color-text-warning);
+        line-height: 1.4;
+      }
+      .status { min-height: 17px; margin-bottom: 7px; color: var(--figma-color-text-secondary); }
+      .status.is-error { color: var(--figma-color-text-danger); }
+      .progress { height: 3px; background: var(--figma-color-bg-secondary); border-radius: 2px; overflow: hidden; margin-bottom: 10px; }
+      .progress > div { height: 100%; width: 0; background: var(--figma-color-bg-brand); transition: width .2s ease; }
+      .primary {
+        width: 100%;
+        height: 40px;
+        border: 0;
+        border-radius: 8px;
+        background: var(--figma-color-bg-brand);
+        color: var(--figma-color-text-onbrand);
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .primary:hover:not(:disabled) { background: var(--figma-color-bg-brand-hover); }
+      .primary:disabled { background: var(--figma-color-bg-disabled); color: var(--figma-color-text-disabled); cursor: default; }
+      [hidden] { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <header>
+        <div class="eyebrow">Editable export</div>
+        <h1>Фреймы → PowerPoint</h1>
+        <p>Текст и простые фигуры останутся редактируемыми. Сложная графика сохранится отдельными объектами.</p>
+      </header>
+      <main>
+        <div class="section-head">
+          <strong>Выбранные слайды</strong>
+          <button class="link-button" data-refresh type="button">Обновить</button>
+        </div>
+        <div id="empty-state" class="empty">
+          <strong>Выберите фреймы на холсте</strong>
+          Порядок в списке станет порядком слайдов.
+        </div>
+        <div id="frame-list" class="frame-list" hidden></div>
+
+        <section class="options">
+          <div class="section-head"><strong>Настройки</strong></div>
+          <label class="field">
+            <span class="field-copy">Качество PNG <span>Для теней, масок и эффектов</span></span>
+            <select id="raster-scale">
+              <option value="1">1×</option>
+              <option value="2" selected>2×</option>
+              <option value="3">3×</option>
+            </select>
+          </label>
+          <label class="field">
+            <span class="field-copy">Скрытые слои <span>Добавить в презентацию</span></span>
+            <input id="include-hidden" type="checkbox" />
+          </label>
+          <label class="field">
+            <span class="field-copy">Примечания <span>Записать ограничения экспорта</span></span>
+            <input id="add-notes" type="checkbox" checked />
+          </label>
+        </section>
+      </main>
+      <footer>
+        <div id="warning-box" class="warning" hidden></div>
+        <div id="status" class="status">Готов к экспорту.</div>
+        <div class="progress"><div id="progress-bar"></div></div>
+        <button id="export-button" class="primary" type="button" disabled>
+          <span id="button-label">Выберите фреймы</span>
+        </button>
+      </footer>
+    </div>
+    <script>/*__UI_BUNDLE__*/</script>
+  </body>
+</html>

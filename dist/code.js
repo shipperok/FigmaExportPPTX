@@ -1,12 +1,63 @@
 "use strict";
 (() => {
+  // src/order.ts
+  function sortBySlideOrder(items) {
+    const numbered = items.map((item) => ({ item, number: numericPrefix(item.name) }));
+    const numbers = numbered.map(({ number }) => number);
+    if (items.length > 1 && numbers.every((number) => number !== null) && new Set(numbers).size === numbers.length) {
+      return numbered.sort((a, b) => a.number - b.number || naturalName(a.item, b.item)).map(({ item }) => item);
+    }
+    const remaining = [...items].sort(
+      (a, b) => a.y - b.y || a.x - b.x || naturalName(a, b)
+    );
+    const result = [];
+    while (remaining.length) {
+      const first = remaining.shift();
+      const row = [first];
+      const tolerance = Math.max(8, first.height * 0.25);
+      for (let index = 0; index < remaining.length; ) {
+        const candidate = remaining[index];
+        const candidateTolerance = Math.max(8, candidate.height * 0.25);
+        if (Math.abs(candidate.y - first.y) <= Math.min(tolerance, candidateTolerance)) {
+          row.push(candidate);
+          remaining.splice(index, 1);
+        } else {
+          index += 1;
+        }
+      }
+      row.sort((a, b) => a.x - b.x || a.y - b.y || naturalName(a, b));
+      result.push(...row);
+    }
+    return result;
+  }
+  function numericPrefix(name) {
+    const match = name.match(/^\s*(\d+)(?:\D|$)/);
+    return match ? Number(match[1]) : null;
+  }
+  function naturalName(a, b) {
+    return a.name.localeCompare(b.name, void 0, { numeric: true, sensitivity: "base" });
+  }
+
   // src/code.ts
   figma.showUI(__html__, { width: 400, height: 590, themeColors: true });
   var post = (message) => figma.ui.postMessage(message);
   function selectedFrames() {
-    return figma.currentPage.selection.filter(
+    const selected = figma.currentPage.selection.filter(
       (node) => node.type === "FRAME" || node.type === "COMPONENT" || node.type === "INSTANCE" || node.type === "SECTION"
     );
+    return sortBySlideOrder(
+      selected.map((node) => {
+        const box = node.absoluteBoundingBox;
+        return {
+          node,
+          name: node.name,
+          x: box?.x ?? ("x" in node ? node.x : 0),
+          y: box?.y ?? ("y" in node ? node.y : 0),
+          width: box?.width ?? ("width" in node ? node.width : 0),
+          height: box?.height ?? ("height" in node ? node.height : 0)
+        };
+      })
+    ).map(({ node }) => node);
   }
   function sendSelection() {
     const frames = selectedFrames().map((node) => ({

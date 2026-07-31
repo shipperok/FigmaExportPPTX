@@ -39,6 +39,8 @@
       main { padding: 18px 20px 0; flex: 1; overflow: auto; }
       .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
       .section-head strong { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+      .section-actions { display: flex; align-items: center; gap: 9px; }
+      .order-hint { color: var(--figma-color-text-tertiary); font-size: 10px; }
       .link-button {
         border: 0;
         background: transparent;
@@ -164,11 +166,14 @@
       <main>
         <div class="section-head">
           <strong>Выбранные слайды</strong>
-          <button class="link-button" data-refresh type="button">Обновить</button>
+          <span class="section-actions">
+            <span class="order-hint">Автопорядок</span>
+            <button class="link-button" data-refresh type="button">Обновить</button>
+          </span>
         </div>
         <div id="empty-state" class="empty">
           <strong>Выберите фреймы на холсте</strong>
-          Порядок в списке станет порядком слайдов.
+          Номера в названиях задают порядок. Без номеров — сверху вниз и слева направо.
         </div>
         <div id="frame-list" class="frame-list" hidden></div>
 

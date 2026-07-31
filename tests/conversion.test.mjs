@@ -41,6 +41,34 @@ test("normalizes rotations", () => {
   assert.equal(normalizeRotation(405), 45);
 });
 
+test("orders explicitly numbered frames by their numeric prefix", async () => {
+  const { sortBySlideOrder } = await importOrderModule();
+  const frames = [
+    { name: "10-End", x: 0, y: 0, width: 100, height: 100 },
+    { name: "2-Content", x: 200, y: 0, width: 100, height: 100 },
+    { name: "1-Title", x: 400, y: 0, width: 100, height: 100 }
+  ];
+  assert.deepEqual(sortBySlideOrder(frames).map((frame) => frame.name), [
+    "1-Title",
+    "2-Content",
+    "10-End"
+  ]);
+});
+
+test("orders unnumbered frames by canvas rows", async () => {
+  const { sortBySlideOrder } = await importOrderModule();
+  const frames = [
+    { name: "Bottom", x: 0, y: 300, width: 100, height: 100 },
+    { name: "Top right", x: 300, y: 5, width: 100, height: 100 },
+    { name: "Top left", x: 0, y: 0, width: 100, height: 100 }
+  ];
+  assert.deepEqual(sortBySlideOrder(frames).map((frame) => frame.name), [
+    "Top left",
+    "Top right",
+    "Bottom"
+  ]);
+});
+
 test("writes Figma text at the correct PowerPoint point size", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "figma-pptx-test-"));
   const bundlePath = path.join(directory, "pptx.mjs");
@@ -92,3 +120,16 @@ test("writes Figma text at the correct PowerPoint point size", async () => {
   // 48 Figma px × (13.333 in / 1920 px) × 72 pt/in ≈ 24 pt.
   assert.match(slideXml, /<a:rPr[^>]*sz="2400"/);
 });
+
+async function importOrderModule() {
+  const directory = await mkdtemp(path.join(tmpdir(), "figma-order-test-"));
+  const bundlePath = path.join(directory, "order.mjs");
+  await build({
+    entryPoints: ["src/order.ts"],
+    outfile: bundlePath,
+    bundle: true,
+    platform: "node",
+    format: "esm"
+  });
+  return import(`file://${bundlePath}`);
+}

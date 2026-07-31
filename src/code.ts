@@ -13,19 +13,33 @@ import type {
   TextRun,
   UiToPluginMessage
 } from "./model";
+import { sortBySlideOrder } from "./order";
 
 figma.showUI(__html__, { width: 400, height: 590, themeColors: true });
 
 const post = (message: PluginToUiMessage) => figma.ui.postMessage(message);
 
 function selectedFrames(): SceneNode[] {
-  return figma.currentPage.selection.filter(
+  const selected = figma.currentPage.selection.filter(
     (node) =>
       node.type === "FRAME" ||
       node.type === "COMPONENT" ||
       node.type === "INSTANCE" ||
       node.type === "SECTION"
   );
+  return sortBySlideOrder(
+    selected.map((node) => {
+      const box = node.absoluteBoundingBox;
+      return {
+        node,
+        name: node.name,
+        x: box?.x ?? ("x" in node ? node.x : 0),
+        y: box?.y ?? ("y" in node ? node.y : 0),
+        width: box?.width ?? ("width" in node ? node.width : 0),
+        height: box?.height ?? ("height" in node ? node.height : 0)
+      };
+    })
+  ).map(({ node }) => node);
 }
 
 function sendSelection(): void {

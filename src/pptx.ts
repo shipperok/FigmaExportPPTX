@@ -99,18 +99,21 @@ function addText(
 ): void {
   const runs = layer.runs.map((run) => ({
     text: run.text,
-    options: {
-      fontFace: run.fontFamily || "Arial",
+    options: (() => {
+      const font = resolvePowerPointFont(run.fontFamily, run.fontStyle, run.fontWeight, run.italic);
+      return {
+      fontFace: font.fontFace,
       fontSize: Math.max(pixelsToPoints(run.fontSize, scale), 1),
       color: rgbHex(run.color),
       transparency: opacityToTransparency(run.opacity * (run.color.a ?? 1)),
-      bold: /bold|black|heavy/i.test(run.fontStyle),
-      italic: /italic|oblique/i.test(run.fontStyle),
+      bold: font.bold,
+      italic: font.italic,
       underline: run.textDecoration === "UNDERLINE" ? { style: "sng" as const } : undefined,
       strike: run.textDecoration === "STRIKETHROUGH" ? "sngStrike" as const : undefined,
       charSpacing: run.letterSpacing ? pixelsToPoints(run.letterSpacing, scale) : undefined,
       breakLine: false
-    }
+      };
+    })()
   }));
   slide.addText(runs, {
     ...position,
@@ -183,6 +186,45 @@ function pixelsToPoints(pixels: number, inchesPerPixel: number): number {
   return pixels * inchesPerPixel * 72;
 }
 
+function resolvePowerPointFont(
+  family: string,
+  figmaStyle: string,
+  fontWeight?: number,
+  explicitItalic?: boolean
+): { fontFace: string; bold: boolean; italic: boolean } {
+  const baseFamily = family.trim() || "Arial";
+  const italic = explicitItalic ?? /italic|oblique/i.test(figmaStyle);
+  const styleWithoutPosture = figmaStyle
+    .replace(/\b(?:italic|oblique)\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const plainStyle = /^(?:regular|normal|book|roman)?$/i.test(styleWithoutPosture);
+  const standardBold = /^(?:bold)$/i.test(styleWithoutPosture);
+
+  if (plainStyle) {
+    return {
+      fontFace: baseFamily,
+      bold: (fontWeight ?? 400) >= 700,
+      italic
+    };
+  }
+  if (standardBold) {
+    return { fontFace: baseFamily, bold: true, italic };
+  }
+
+  // OOXML exposes only boolean bold/italic switches. Intermediate weights such
+  // as Light, Medium and SemiBold must therefore be addressed by their installed
+  // face name (for example, "Roboto Medium").
+  const familyAlreadyIncludesStyle = baseFamily
+    .toLocaleLowerCase()
+    .endsWith(styleWithoutPosture.toLocaleLowerCase());
+  return {
+    fontFace: familyAlreadyIncludesStyle ? baseFamily : `${baseFamily} ${styleWithoutPosture}`,
+    bold: false,
+    italic
+  };
+}
+
 function normalizeRotation(value: number): number {
   return ((value % 360) + 360) % 360;
 }
@@ -211,5 +253,6 @@ export const conversionInternals = {
   rgbHex,
   opacityToTransparency,
   normalizeRotation,
-  pixelsToPoints
+  pixelsToPoints,
+  resolvePowerPointFont
 };

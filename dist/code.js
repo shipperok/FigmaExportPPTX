@@ -198,6 +198,8 @@
     const segments = node.getStyledTextSegments([
       "fontName",
       "fontSize",
+      "fontWeight",
+      "fontStyle",
       "fills",
       "letterSpacing",
       "textDecoration"
@@ -211,6 +213,8 @@
         text: segment.characters,
         fontFamily: fontName.family,
         fontStyle: fontName.style,
+        fontWeight: segment.fontWeight,
+        italic: segment.fontStyle === "ITALIC",
         fontSize,
         color: fill ? rgba(fill.color, fill.opacity) : { r: 0, g: 0, b: 0, a: 1 },
         opacity: fill?.opacity ?? 1,

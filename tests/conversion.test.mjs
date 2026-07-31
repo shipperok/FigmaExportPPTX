@@ -103,6 +103,31 @@ test("writes Figma text at the correct PowerPoint point size", async () => {
           text: "Editable title",
           fontFamily: "Arial",
           fontStyle: "Regular",
+          fontWeight: 400,
+          fontSize: 48,
+          color: { r: 0, g: 0, b: 0 },
+          opacity: 1
+        }, {
+          text: " Light",
+          fontFamily: "Roboto",
+          fontStyle: "Light",
+          fontWeight: 300,
+          fontSize: 48,
+          color: { r: 0, g: 0, b: 0 },
+          opacity: 1
+        }, {
+          text: " Medium",
+          fontFamily: "Roboto",
+          fontStyle: "Medium",
+          fontWeight: 500,
+          fontSize: 48,
+          color: { r: 0, g: 0, b: 0 },
+          opacity: 1
+        }, {
+          text: " Bold",
+          fontFamily: "Roboto",
+          fontStyle: "Bold",
+          fontWeight: 700,
           fontSize: 48,
           color: { r: 0, g: 0, b: 0 },
           opacity: 1
@@ -119,6 +144,9 @@ test("writes Figma text at the correct PowerPoint point size", async () => {
   const slideXml = await readFile(path.join(directory, "ppt/slides/slide1.xml"), "utf8");
   // 48 Figma px × (13.333 in / 1920 px) × 72 pt/in ≈ 24 pt.
   assert.match(slideXml, /<a:rPr[^>]*sz="2400"/);
+  assert.match(slideXml, /<a:latin typeface="Roboto Light"/);
+  assert.match(slideXml, /<a:latin typeface="Roboto Medium"/);
+  assert.match(slideXml, /<a:rPr[^>]*b="1"[^>]*>[\s\S]*?<a:latin typeface="Roboto"/);
 });
 
 async function importOrderModule() {

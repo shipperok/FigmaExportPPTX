@@ -18,6 +18,8 @@ export type TextRun = {
   text: string;
   fontFamily: string;
   fontStyle: string;
+  fontWeight?: number;
+  italic?: boolean;
   fontSize: number;
   color: Rgb;
   opacity: number;

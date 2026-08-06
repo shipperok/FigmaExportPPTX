@@ -86,6 +86,22 @@
     return text;
   }
 
+  // src/geometry.ts
+  function lineGeometryFromTransform(transform, localWidth, originX, originY) {
+    const [[a, , translateX], [b, , translateY]] = transform;
+    const startX = translateX - originX;
+    const startY = translateY - originY;
+    const endX = translateX + a * localWidth - originX;
+    const endY = translateY + b * localWidth - originY;
+    return {
+      x: Math.min(startX, endX),
+      y: Math.min(startY, endY),
+      width: Math.abs(endX - startX),
+      height: Math.abs(endY - startY),
+      flipV: (endX - startX) * (endY - startY) < 0
+    };
+  }
+
   // src/order.ts
   function sortBySlideOrder(items) {
     const numbered = items.map((item) => ({ item, number: numericPrefix(item.name) }));
@@ -243,7 +259,7 @@
   async function serializeNode(node, slideRoot, originX, originY, options, output, warnings) {
     if (!options.includeHidden && !isVisibleThroughTree(node, slideRoot)) return;
     const box = node.absoluteBoundingBox;
-    if (!box || box.width <= 0 || box.height <= 0) return;
+    if (!box || node.type !== "LINE" && (box.width <= 0 || box.height <= 0)) return;
     if (node.type === "TEXT") {
       const text = serializeText(node, originX, originY);
       if (text) {
@@ -338,7 +354,7 @@
     const fill = solidFill(node);
     const stroke = solidStroke(node);
     const radius = node.type === "RECTANGLE" || node.type === "FRAME" || node.type === "COMPONENT" || node.type === "INSTANCE" ? node.cornerRadius === figma.mixed ? 0 : node.cornerRadius : void 0;
-    return {
+    const layer = {
       ...baseLayer(node, originX, originY),
       kind: "shape",
       shape: node.type === "ELLIPSE" ? "ellipse" : node.type === "LINE" ? "line" : "rect",
@@ -348,6 +364,21 @@
       radius,
       dash: "dashPattern" in node ? [...node.dashPattern] : void 0
     };
+    if (node.type === "LINE") {
+      const geometry = lineGeometryFromTransform(
+        node.absoluteTransform,
+        node.width,
+        originX,
+        originY
+      );
+      layer.x = geometry.x;
+      layer.y = geometry.y;
+      layer.width = geometry.width;
+      layer.height = geometry.height;
+      layer.rotation = 0;
+      layer.flipV = geometry.flipV;
+    }
+    return layer;
   }
   async function exportOwnBackground(node, originX, originY, rasterScale) {
     if (node.type === "GROUP") {

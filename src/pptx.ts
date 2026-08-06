@@ -153,7 +153,12 @@ function addShape(
     : { color: "FFFFFF", transparency: 100, width: 0 };
 
   if (layer.shape === "line") {
-    slide.addShape(pptx.ShapeType.line, { ...position, fill, line });
+    slide.addShape(pptx.ShapeType.line, {
+      ...position,
+      flipV: layer.flipV,
+      fill,
+      line
+    });
     return;
   }
   const rounded = layer.shape === "rect" && (layer.radius ?? 0) > 0;

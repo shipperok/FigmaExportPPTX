@@ -14,6 +14,7 @@ import type {
   UiToPluginMessage
 } from "./model";
 import { isLocale, t, type Locale } from "./i18n";
+import { lineGeometryFromTransform } from "./geometry";
 import { sortBySlideOrder } from "./order";
 
 figma.showUI(__html__, { width: 400, height: 590, themeColors: true });
@@ -159,7 +160,7 @@ async function serializeNode(
 ): Promise<void> {
   if (!options.includeHidden && !isVisibleThroughTree(node, slideRoot)) return;
   const box = node.absoluteBoundingBox;
-  if (!box || box.width <= 0 || box.height <= 0) return;
+  if (!box || (node.type !== "LINE" && (box.width <= 0 || box.height <= 0))) return;
 
   if (node.type === "TEXT") {
     const text = serializeText(node, originX, originY);
@@ -283,7 +284,7 @@ function serializeShape(
         ? 0
         : node.cornerRadius
       : undefined;
-  return {
+  const layer: ShapeLayer = {
     ...baseLayer(node, originX, originY),
     kind: "shape",
     shape: node.type === "ELLIPSE" ? "ellipse" : node.type === "LINE" ? "line" : "rect",
@@ -293,6 +294,21 @@ function serializeShape(
     radius,
     dash: "dashPattern" in node ? [...node.dashPattern] : undefined
   };
+  if (node.type === "LINE") {
+    const geometry = lineGeometryFromTransform(
+      node.absoluteTransform,
+      node.width,
+      originX,
+      originY
+    );
+    layer.x = geometry.x;
+    layer.y = geometry.y;
+    layer.width = geometry.width;
+    layer.height = geometry.height;
+    layer.rotation = 0;
+    layer.flipV = geometry.flipV;
+  }
+  return layer;
 }
 
 async function exportOwnBackground(

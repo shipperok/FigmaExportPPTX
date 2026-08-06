@@ -43,6 +43,7 @@ export type BaseLayer = {
 export type ShapeLayer = BaseLayer & {
   kind: "shape";
   shape: "rect" | "ellipse" | "line";
+  flipV?: boolean;
   fill?: Rgb;
   stroke?: Rgb;
   strokeWidth?: number;

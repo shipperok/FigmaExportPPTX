@@ -41,6 +41,27 @@ test("normalizes rotations", () => {
   assert.equal(normalizeRotation(405), 45);
 });
 
+test("converts Figma line transforms to PowerPoint endpoints", async () => {
+  const { lineGeometryFromTransform } = await importGeometryModule();
+
+  assert.deepEqual(
+    lineGeometryFromTransform([[1, 0, 110], [0, 1, 70]], 80, 10, 20),
+    { x: 100, y: 50, width: 80, height: 0, flipV: false }
+  );
+
+  const diagonal = lineGeometryFromTransform(
+    [[Math.SQRT1_2, Math.SQRT1_2, 110], [-Math.SQRT1_2, Math.SQRT1_2, 170]],
+    100,
+    10,
+    20
+  );
+  assert.ok(Math.abs(diagonal.x - 100) < 1e-10);
+  assert.ok(Math.abs(diagonal.y - 79.28932188134524) < 1e-10);
+  assert.ok(Math.abs(diagonal.width - 70.71067811865476) < 1e-10);
+  assert.ok(Math.abs(diagonal.height - 70.71067811865476) < 1e-10);
+  assert.equal(diagonal.flipV, true);
+});
+
 test("orders explicitly numbered frames by their numeric prefix", async () => {
   const { sortBySlideOrder } = await importOrderModule();
   const frames = [
@@ -177,6 +198,19 @@ async function importI18nModule() {
   const bundlePath = path.join(directory, "i18n.mjs");
   await build({
     entryPoints: ["src/i18n.ts"],
+    outfile: bundlePath,
+    bundle: true,
+    platform: "node",
+    format: "esm"
+  });
+  return import(`file://${bundlePath}`);
+}
+
+async function importGeometryModule() {
+  const directory = await mkdtemp(path.join(tmpdir(), "figma-geometry-test-"));
+  const bundlePath = path.join(directory, "geometry.mjs");
+  await build({
+    entryPoints: ["src/geometry.ts"],
     outfile: bundlePath,
     bundle: true,
     platform: "node",
